@@ -2,7 +2,7 @@ import os
 clear = 'cls' if os.name == 'nt' else 'clear'
 os.system(clear)
 
-def cadastra_endereco():
+def cadastrar_endereco():
     os.system(clear)
     print("Agora vamos cadastrar seu endereço.")
     logradouro = ""
@@ -31,10 +31,12 @@ def cadastra_endereco():
         if estado.upper() not in ufs:
             print('Estado no formato incorreto!')
             estado = ""
+
+    os.system(clear)
     return f"{logradouro}, {numero} - {bairro} - {cidade}/{estado.upper()}"
 
 
-def cria_usuario():
+def criar_usuario():
     nome = ""
     while nome=="":
         nome = input('Escreva o nome: ')
@@ -69,7 +71,23 @@ def cria_usuario():
             print('Escreva apenas números de acordo com o formato especificado para o CPF!')
             cpf = ""
     
-    os.system(clear)
-    return dict(nome=nome.title(), data=data, cpf=cpf, endereco=cadastra_endereco())
+    return dict(nome=nome.title(), data=data, cpf=cpf, endereco=cadastrar_endereco())
 
-print(cria_usuario())
+def criar_conta(conta, usuario):
+    agencia = '0001'
+    if len(conta)==0:
+        numero = 1
+    else:
+        numero = conta[-1]['numero'] + 1
+    conta.append(dict(agencia=agencia, numero=numero, usuario=usuario['cpf']))
+
+    return conta
+
+usuario0 = dict(nome='', data='', cpf='', endereco='')
+# conta0 = dict(agencia = '0001', numero=0, usuario=usuario0)
+usuario = []; conta = []
+conta = criar_conta(conta, usuario0)
+print(conta)
+
+print(usuario)
+print(conta)
