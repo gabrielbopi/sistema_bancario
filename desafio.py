@@ -1,3 +1,7 @@
+import os
+clear = 'cls' if os.name == 'nt' else 'clear'
+os.system(clear)
+
 #Funçoes
 def depositar(saldo,extrato,/):
     valor = float(input("Informe o valor do depósito: "))
@@ -12,7 +16,7 @@ def depositar(saldo,extrato,/):
     return saldo,extrato
 
 def sacar(*,saldo,extrato):
-    global numero_saques, LIMITE_SAQUES
+    global numero_saques, LIMITE_SAQUES, limite
 
     valor = float(input("Informe o valor do saque: "))
 
@@ -48,19 +52,46 @@ def mostrar_extrato(saldo, /, *, extrato):
         print("==========================================")
 
 
+def mostrar_menu():
+    os.system(clear)
+
+    # menu = """
+
+    # [c] cadastrar conta
+    # [l] listar contas
+    # [u] cadastrar usuário
+    menu = """
+    [d] Depositar
+    [s] Sacar
+    [e] Extrato
+    [q] Sair
+
+    => """
+
+    saldo = 0
+    global limite, extrato, numero_saques, LIMITE_SAQUES
+
+    while True:
+
+        opcao = input(menu)
+
+        if opcao == "d":
+            saldo,extrato = depositar(saldo,extrato)
+
+        elif opcao == "s":
+            saldo,extrato = sacar(saldo=saldo, extrato=extrato)
+            
+        elif opcao == "e":
+            mostrar_extrato(saldo,extrato=extrato)
+
+        elif opcao == "q":
+            break
+
+        else:
+            print("Operação inválida, por favor selecione novamente a operação desejada.")
+
 
 #Corpo do programa
-menu = """
-
-[c] cadastrar conta
-[l] listar contas
-[u] cadastrar usuário
-[d] Depositar
-[s] Sacar
-[e] Extrato
-[q] Sair
-
-=> """
 
 saldo = 0
 limite = 500
@@ -68,21 +99,4 @@ extrato = ""
 numero_saques = 0
 LIMITE_SAQUES = 3
 
-while True:
-
-    opcao = input(menu)
-
-    if opcao == "d":
-        saldo,extrato = depositar(saldo,extrato)
-
-    elif opcao == "s":
-        saldo,extrato = sacar(saldo=saldo, extrato=extrato)
-        
-    elif opcao == "e":
-        mostrar_extrato(saldo,extrato=extrato)
-
-    elif opcao == "q":
-        break
-
-    else:
-        print("Operação inválida, por favor selecione novamente a operação desejada.")
+mostrar_menu()

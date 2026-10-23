@@ -11,11 +11,11 @@ def cadastrar_endereco():
 
     numero = ""
     while numero=="":
-        numero = input('Escreva o numero: ')
-        if not numero.isdigit():
+        input_numero = input('Escreva o numero: ')
+        if not input_numero.isdigit():
             print('Escreva apenas números!')
-            numero = ""
-
+        else:
+            numero = input_numero
     bairro = ""
     while bairro=="":
         bairro = input('Escreva o bairro: ')
@@ -27,51 +27,56 @@ def cadastrar_endereco():
     ufs = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
     estado = ""
     while estado=="":
-        estado = input('Escreva a sigla do estado (Ex: BA, SP, ...): ')
-        if estado.upper() not in ufs:
+        input_estado = input('Escreva a sigla do estado (Ex: BA, SP, ...): ')
+        if input_estado.upper() not in ufs:
             print('Estado no formato incorreto!')
-            estado = ""
+        else:
+            estado = input_estado.upper()
 
     os.system(clear)
-    return f"{logradouro}, {numero} - {bairro} - {cidade}/{estado.upper()}"
+    return f"{logradouro}, {numero} - {bairro} - {cidade}/{estado}"
 
 
-def criar_usuario():
+
+def criar_usuario(usuario):
     nome = ""
     while nome=="":
-        nome = input('Escreva o nome: ')
-        contem_numero = any(char.isdigit() for char in nome)
+        input_nome = input('Escreva o nome: ')
+        contem_numero = any(char.isdigit() for char in input_nome)
         if contem_numero:
             print('O nome não pode conter números!')
-            nome = ""
-
+        else:
+            nome = input_nome
     data = ""
     while data=="":
-        data = input('Escreva a sua data de nascimento (formato DD/MM/AAAA): ')
-        if len(data)!=10: #Verifica tamanho do campo
+        input_data = input('Escreva a sua data de nascimento (formato DD/MM/AAAA): ')
+        if len(input_data)!=10: #Verifica tamanho do campo
             print('Formato inválido. A data deve ter a quantidade especificada de dígitos!') 
-            data = ""
-        elif not (data[2]=='/' and data[5]=='/'): #Verifica se há barras
+        elif not (input_data[2]=='/' and input_data[5]=='/'): #Verifica se há barras
             print('Formato inválido. Não esqueça as barras (/)!') 
-            data = ""
-        elif not all(char.isdigit() for char in data.replace('/','')): #Verifica se os digitos são numéricos
+        elif not all(char.isdigit() for char in input_data.replace('/','')): #Verifica se os digitos são numéricos
             print('Escreva apenas números e barras de acordo com o formato especificado!')
-            data = ""
-        elif int(data[:2])>31 or int(data[3:5])>12 or int(data[6:10])>2026 :
+        elif int(input_data[:2])>31 or int(input_data[3:5])>12 or int(input_data[6:10])>2026 :
             print('Valor invalido para o dia, mês ou ano!')
-            data = ""
+        else:
+            data = input_data
 
     cpf = ""
     while cpf=="":
-        cpf = input('Escreva seu CPF (apenas números): ')
-        if len(cpf)!=11: #Verifica tamanho do campo
+        input_cpf = input('Escreva seu CPF (apenas números): ')
+        if len(input_cpf)!=11: #Verifica tamanho do campo
             print('Formato inválido. O CPF deve conter 11 dígitos!') 
-            cpf = ""
-        elif not all(char.isdigit() for char in cpf): #Verifica se os digitos são numéricos
+        elif not all(char.isdigit() for char in input_cpf): #Verifica se os digitos são numéricos
             print('Escreva apenas números de acordo com o formato especificado para o CPF!')
-            cpf = ""
+        elif any([individuo['cpf']==input_cpf for individuo in usuario]): #Verifica se já existe esse CPF já cadastrado para outros usuários
+            print('Não foi possível cadastrar. Uma pessoa com esse CPF já existe no sistema!')
+        else:
+            cpf = input_cpf 
+    usuario.append(dict(nome=nome.title(), data=data, cpf=cpf, endereco=cadastrar_endereco()))
+    os.system(clear)
+    print(f'Criado usuário: {usuario}')
     
-    return dict(nome=nome.title(), data=data, cpf=cpf, endereco=cadastrar_endereco())
+    return usuario
 
 def criar_conta(conta, usuario):
     agencia = '0001'
@@ -80,14 +85,23 @@ def criar_conta(conta, usuario):
     else:
         numero = conta[-1]['numero'] + 1
     conta.append(dict(agencia=agencia, numero=numero, usuario=usuario['cpf']))
+    os.system(clear)
+    print(f'''Conta associada ao usuário {usuario['nome']}:
+        Agencia: {conta[-1]['agencia']}, número: {conta[-1]['numero']}''')
 
     return conta
 
-usuario0 = dict(nome='', data='', cpf='', endereco='')
-# conta0 = dict(agencia = '0001', numero=0, usuario=usuario0)
 usuario = []; conta = []
-conta = criar_conta(conta, usuario0)
-print(conta)
+usuario.append(dict(nome='alguem1', data='01', cpf='01234567890', endereco=''))
+usuario.append(dict(nome='alguem2', data='02', cpf='01234567891', endereco=''))
+i=-1
+conta0 = dict(agencia = '0001', numero=1, usuario=usuario[i])
+conta.append(conta0)
+# usuario = criar_usuario(usuario)
+conta = criar_conta(conta, usuario[i])
 
-print(usuario)
-print(conta)
+
+# print(conta)
+
+# print(usuario)
+# print(conta)
