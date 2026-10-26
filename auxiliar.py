@@ -78,12 +78,13 @@ def criar_usuario(usuario):
     
     return usuario
 
-def criar_conta(conta, usuario):
+def criar_conta(conta, usuarios):
+    usuario = procurar_usuario(usuarios)
     agencia = '0001'
     if len(conta)==0:
         numero = 1
     else:
-        numero = conta[-1]['numero'] + 1
+        numero = str(int(conta[-1]['numero']) + 1) #Atribui à atual um número que é o sucessor do da ultima conta cadastrada.
     conta.append(dict(agencia=agencia, numero=numero, usuario=usuario['cpf']))
     os.system(clear)
     print(f'''Conta associada ao usuário {usuario['nome']}:
@@ -91,15 +92,51 @@ def criar_conta(conta, usuario):
 
     return conta
 
+def procurar_usuario(usuario):
+    os.system(clear)
+    cpf = ""
+    while cpf=="":
+        input_cpf = input('Escreva o CPF do usuário para a conta (apenas números): ')
+        if len(input_cpf)!=11: #Verifica tamanho do campo
+            print('Formato inválido. O CPF deve conter 11 dígitos!') 
+        elif not all(char.isdigit() for char in input_cpf): #Verifica se os digitos são numéricos
+            print('Escreva apenas números de acordo com o formato especificado para o CPF!')
+        elif not any([individuo['cpf']==input_cpf for individuo in usuario]): #Verifica se já existe esse CPF já cadastrado para outros usuários
+            print('CPF não encontrado no sistema! Digite um usuário já cadastrado.')
+        else:
+            cpf = input_cpf
+            indice_usuario = [individuo['cpf'] for individuo in usuario].index(cpf)
+
+    return usuario[indice_usuario]
+            
+def procurar_conta(contas):
+    os.system(clear)
+    numero = 0
+    while numero == 0:
+        input_numero = input('Escreva o número da conta (apenas números): ')
+        
+        if not all(char.isdigit() for char in input_numero): #Verifica se os digitos são numéricos
+            print('Escreva apenas digitos numéricos!')
+        elif not any([conta['numero']==input_numero for conta in contas]): #Verifica se o número existe
+            print('Número não encontrado no sistema! Digite uma conta já cadastrada.')
+        else:
+            numero = input_numero
+            indice_conta = [conta['numero'] for conta in contas].index(numero)
+
+    return contas[indice_conta]
+
+
 usuario = []; conta = []
 usuario.append(dict(nome='alguem1', data='01', cpf='01234567890', endereco=''))
 usuario.append(dict(nome='alguem2', data='02', cpf='01234567891', endereco=''))
-i=-1
-conta0 = dict(agencia = '0001', numero=1, usuario=usuario[i])
-conta.append(conta0)
-# usuario = criar_usuario(usuario)
-conta = criar_conta(conta, usuario[i])
+conta0 = dict(agencia = '0001', numero='1', usuario=usuario[0])
+conta1 = dict(agencia = '0001', numero='2', usuario=usuario[1])
+conta.append(conta0); conta.append(conta1)
 
+# usuario = criar_usuario(usuario)
+# conta = criar_conta(conta, usuario)
+# print(conta)
+print(procurar_conta(conta))
 
 # print(conta)
 
