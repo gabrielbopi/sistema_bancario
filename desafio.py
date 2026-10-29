@@ -131,7 +131,14 @@ def procurar_conta(contas):
 def depositar(saldo,extrato,/):
     os.system(clear)
 
-    valor = float(input("Informe o valor do depósito: "))
+    valor = ''
+    while True:
+        input_valor = input("Informe o valor do depósito: ")
+        if not input_valor.isdigit(): #Verifica se os digitos são numéricos
+            print('Escreva apenas digitos numéricos!')
+        else:
+            valor = float(input_valor)
+            break
 
     if valor > 0:
         saldo += valor
@@ -146,8 +153,14 @@ def sacar(*,saldo,extrato, n_saques, limite):
     global LIMITE_SAQUES
 
     os.system(clear)
-
-    valor = float(input("Informe o valor do saque: "))
+    valor = ''
+    while True:
+        input_valor = input("Informe o valor do saque: ")
+        if not input_valor.isdigit(): #Verifica se os digitos são numéricos
+            print('Escreva apenas digitos numéricos!')
+        else:
+            valor = float(input_valor)
+            break
 
     excedeu_saldo = valor > saldo
 
@@ -227,9 +240,6 @@ def menu_principal(usuarios, contas):
 
     => """
 
-    # saldo = 0
-    # global limite, extrato, numero_saques, LIMITE_SAQUES
-
     while True:
 
         opcao = input(menu)
@@ -261,12 +271,11 @@ def menu_principal(usuarios, contas):
 LIMITE_SAQUES = 3
 usuarios = []; contas = []
 
-usuarios.append(dict(nome='alguem1', data='11', cpf='01234567890', endereco=''))
-usuarios.append(dict(nome='alguem2', data='12', cpf='01234567891', endereco=''))
-conta0 = dict(agencia = '0001', numero='1', saldo = 0, limite = 500, extrato = "", numero_saques = 0, usuario=usuarios[0])
-conta1 = dict(agencia = '0001', numero='2', saldo = 0, limite = 500, extrato = "", numero_saques = 0,  usuario=usuarios[1])
-contas.append(conta0); contas.append(conta1)
+# usuarios.append(dict(nome='alguem1', data='11', cpf='01234567890', endereco=''))
+# usuarios.append(dict(nome='alguem2', data='12', cpf='01234567891', endereco=''))
+# conta0 = dict(agencia = '0001', numero='1', saldo = 0, limite = 500, extrato = "", numero_saques = 0, usuario=usuarios[0])
+# conta1 = dict(agencia = '0001', numero='2', saldo = 0, limite = 500, extrato = "", numero_saques = 0,  usuario=usuarios[1])
+# contas.append(conta0); contas.append(conta1)
 
-contas.__dict__
 
-# menu_principal(usuarios, contas)
+menu_principal(usuarios, contas)
