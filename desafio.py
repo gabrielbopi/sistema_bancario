@@ -233,9 +233,6 @@ def filtrar_conta(numero:int, contas:list) -> Conta:
 #CORPO DO PROGRAMA
 def main():
 
-    # usuario1 = PessoaFisica('algum lugar', [], '01234567890', 'alguem1', '01-02-2000')
-    # conta1 = ContaCorrente(usuario1, Historico(), Conta._AGENCIA, 1)
-    # usuarios = [usuario1];  contas = [conta1]
     usuarios = [];  contas = []
 
     while True:
