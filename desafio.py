@@ -271,11 +271,5 @@ def menu_principal(usuarios, contas):
 LIMITE_SAQUES = 3
 usuarios = []; contas = []
 
-# usuarios.append(dict(nome='alguem1', data='11', cpf='01234567890', endereco=''))
-# usuarios.append(dict(nome='alguem2', data='12', cpf='01234567891', endereco=''))
-# conta0 = dict(agencia = '0001', numero='1', saldo = 0, limite = 500, extrato = "", numero_saques = 0, usuario=usuarios[0])
-# conta1 = dict(agencia = '0001', numero='2', saldo = 0, limite = 500, extrato = "", numero_saques = 0,  usuario=usuarios[1])
-# contas.append(conta0); contas.append(conta1)
-
 
 menu_principal(usuarios, contas)
