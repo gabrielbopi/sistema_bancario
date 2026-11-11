@@ -8,8 +8,8 @@ Modificações feitas a partir do código original em [https://github.com/digita
 
 Nesta branch há a segunda versão do desafio para o módulo (Programação Orientada à Objetos com Python). Veja outras versões nas branches:
 
-1-funcoes_estrutura-dados
-**2-orientacao-objetos**
+- 1-funcoes_estrutura-dados
+- **2-orientacao-objetos**
 
 
 
