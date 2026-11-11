@@ -6,11 +6,11 @@ Código para um sistema de acesso à contas bancárias em python ('desafio.py').
 
 Modificações feitas a partir do código original em [https://github.com/digitalinnovationone/trilha-python-dio/blob/main/01%20-%20Estrutura%20de%20dados/desafio.py]
 
-Nesta branch há a segunda versão do desafio para o módulo (Programação Orientada à Objetos com Python). Veja outras versões nas branches:
+Na branch **main** está disponível a última versão do desafio. Veja outras versões nas branches:
 
 - 1-funcoes_estrutura-dados
-- **2-orientacao-objetos**
-
+- 2-orientacao-objetos
+- **main**
 
 
 ## Features
