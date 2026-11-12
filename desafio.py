@@ -1,7 +1,6 @@
 #Modificações feitas a partir do código original em 'https://github.com/digitalinnovationone/trilha-python-dio/blob/main/01%20-%20Estrutura%20de%20dados/desafio.py'
 # Autor do novo código: Gabriel Pinheiro @gabrielbopi
 
-from datetime import datetime
 from abc import ABC, abstractmethod
 
 #CLASSES
@@ -165,10 +164,19 @@ class Historico:
     def adicionar_transacao(self, transacao:Transacao):
         self.transacoes.append(transacao)
 
-
+#DECORADOR
+def log_transacao(operacao):
+    from datetime import datetime
+    from functools import wraps
+    @wraps(operacao)
+    def envelope(*args, **kwargs):
+        print('Transação de ' + operacao.__name__.title() + ' em ' + str(datetime.now()))
+        operacao(*args, **kwargs)    
+    return envelope
 
 #FUNÇÕES ESTÁTICAS
     #Transaçao
+@log_transacao
 def depositar(contas:list):
     numero_conta = int(input("Informe o número da conta (somente número):) "))
     conta = filtrar_conta(numero_conta, contas)
@@ -179,6 +187,7 @@ def depositar(contas:list):
     usuario.realizar_transacao(conta, Deposito)
     return True
 
+@log_transacao
 def sacar(contas:list):
     numero_conta = int(input("Informe o número da conta (somente número):) "))
     conta = filtrar_conta(numero_conta, contas)
@@ -190,6 +199,7 @@ def sacar(contas:list):
     return True
 
     #Cliente
+@log_transacao
 def criar_usuario(usuarios):
     cpf = input("Informe o CPF (somente número): ")
     usuario_ocupado = filtrar_usuario(cpf, usuarios)
@@ -216,6 +226,7 @@ def filtrar_usuario(cpf:str, usuarios:list) -> Cliente:
 
 
     #Conta
+@log_transacao
 def criar_conta(contas:list, usuarios:list) -> Conta:  
     numero = len(contas) + 1
     cpf = input("Informe o CPF do usuário: ")
@@ -247,6 +258,7 @@ def listar_contas(contas:list):
         print("=" * 100)
         print(textwrap.dedent(linha))
 
+@log_transacao
 def exibir_extrato(contas:list):
     numero_conta = int(input("Informe o número da conta (somente número):) "))
     conta = filtrar_conta(numero_conta, contas)
