@@ -1,6 +1,7 @@
 #Modificações feitas a partir do código original em 'https://github.com/digitalinnovationone/trilha-python-dio/blob/main/01%20-%20Estrutura%20de%20dados/desafio.py'
 # Autor do novo código: Gabriel Pinheiro @gabrielbopi
 
+from datetime import datetime
 from abc import ABC, abstractmethod
 
 #CLASSES
@@ -35,27 +36,6 @@ class PessoaFisica(Cliente):
     def cpf(self):
         return self._cpf
 
-    @staticmethod
-    def criar_usuario(usuarios):
-        cpf = input("Informe o CPF (somente número): ")
-        usuario_ocupado = PessoaFisica.filtrar_usuario(cpf, usuarios)
-
-        if usuario_ocupado:
-            print("\n@@@ Já existe usuário com esse CPF! @@@")
-            return
-
-        nome = input("Informe o nome completo: ")
-        data_nascimento = input("Informe a data de nascimento (dd-mm-aaaa): ")
-        endereco = input("Informe o endereço (logradouro, nro - bairro - cidade/sigla estado): ")
-        usuario = PessoaFisica(endereco, [], cpf, nome, data_nascimento)
-        if usuario:
-            usuarios.append(usuario)
-            print("=== Usuário criado com sucesso! ===")
-        else:
-            print("\n@@@ Falha na criação do usuário! @@@")
-
-        return usuarios
-
     
     #Conta
 class Conta(ABC):
@@ -79,6 +59,18 @@ class Conta(ABC):
     @property
     def numero(self) -> int:
         return self._numero
+
+    @property
+    def agencia(self) -> int:
+        return self._agencia
+
+    @property
+    def cliente(self) -> Cliente:
+        return self._cliente
+
+    @property
+    def historico(self) -> Historico:
+        return self._historico
 
     def sacar(self, valor: float) -> bool: 
         
@@ -124,18 +116,6 @@ class Conta(ABC):
     def nova_conta(cls):
         pass
 
-    @staticmethod
-    def listar_contas(contas:list):
-        import textwrap
-
-        for conta in contas:
-            linha = f"""\
-                Agência:\t{conta._agencia}
-                C/C:\t\t{conta._numero}
-                Titular:\t{conta._cliente._nome}
-            """
-            print("=" * 100)
-            print(textwrap.dedent(linha))
 
 class ContaCorrente(Conta):
 
@@ -186,8 +166,96 @@ class Historico:
         self.transacoes.append(transacao)
 
 
-#FUNÇÕES ESTÁTICAS
 
+#FUNÇÕES ESTÁTICAS
+    #Transaçao
+def depositar(contas:list):
+    numero_conta = int(input("Informe o número da conta (somente número):) "))
+    conta = filtrar_conta(numero_conta, contas)
+    if not conta:
+        print("\n@@@ Conta não encontrada! @@@")
+        return False
+    usuario = conta.cliente
+    usuario.realizar_transacao(conta, Deposito)
+    return True
+
+def sacar(contas:list):
+    numero_conta = int(input("Informe o número da conta (somente número):) "))
+    conta = filtrar_conta(numero_conta, contas)
+    if not conta:
+        print("\n@@@ Conta não encontrada! @@@")
+        return False
+    usuario = conta.cliente
+    usuario.realizar_transacao(conta, Saque)
+    return True
+
+    #Cliente
+def criar_usuario(usuarios):
+    cpf = input("Informe o CPF (somente número): ")
+    usuario_ocupado = filtrar_usuario(cpf, usuarios)
+
+    if usuario_ocupado:
+        print("\n@@@ Já existe usuário com esse CPF! @@@")
+        return usuarios
+
+    nome = input("Informe o nome completo: ")
+    data_nascimento = input("Informe a data de nascimento (dd-mm-aaaa): ")
+    endereco = input("Informe o endereço (logradouro, nro - bairro - cidade/sigla estado): ")
+    usuario = PessoaFisica(endereco, [], cpf, nome, data_nascimento)
+    if usuario:
+        usuarios.append(usuario)
+        print("=== Usuário criado com sucesso! ===")
+    else:
+        print("\n@@@ Falha na criação do usuário! @@@")
+
+    return usuarios
+
+def filtrar_usuario(cpf:str, usuarios:list) -> Cliente:
+    usuarios_filtrados = [usuario for usuario in usuarios if usuario.cpf == cpf]
+    return usuarios_filtrados[0] if usuarios_filtrados else None
+
+
+    #Conta
+def criar_conta(contas:list, usuarios:list) -> Conta:  
+    numero = len(contas) + 1
+    cpf = input("Informe o CPF do usuário: ")
+    usuario = filtrar_usuario(cpf, usuarios)
+
+    if usuario:
+        conta_nova = ContaCorrente.nova_conta(usuario, numero)
+        usuario.adicionar_conta(conta_nova)
+        print("\n=== Conta criada com sucesso! ===")
+        contas.append(conta_nova)
+    else:    
+        print("\n@@@ Usuário não encontrado, fluxo de criação de conta encerrado! @@@")
+
+    return contas
+
+def filtrar_conta(numero:int, contas:list) -> Conta:
+    contas_filtradas = [conta for conta in contas if conta.numero == numero]
+    return contas_filtradas[0] if contas_filtradas else None
+
+def listar_contas(contas:list):
+    import textwrap
+
+    for conta in contas:
+        linha = f"""\
+            Agência:\t{conta._agencia}
+            C/C:\t\t{conta._numero}
+            Titular:\t{conta._cliente._nome}
+        """
+        print("=" * 100)
+        print(textwrap.dedent(linha))
+
+def exibir_extrato(contas:list):
+    numero_conta = int(input("Informe o número da conta (somente número):) "))
+    conta = filtrar_conta(numero_conta, contas)
+    print("\n================ EXTRATO ================")
+    print("Não foram realizadas movimentações." if not conta._historico else conta._historico)
+    print(f"\nSaldo:\t\tR$ {conta.saldo:.2f}")
+    print("==========================================")
+
+    #Menu
 def menu():
     import textwrap
     
@@ -203,68 +271,38 @@ def menu():
     => """
     return input(textwrap.dedent(menu))
 
-def exibir_extrato(conta:Conta):
-    print("\n================ EXTRATO ================")
-    print("Não foram realizadas movimentações." if not conta._historico else conta._historico)
-    print(f"\nSaldo:\t\tR$ {conta.saldo:.2f}")
-    print("==========================================")
-
-def criar_conta(numero:int, usuarios:list) -> Conta:  
-    cpf = input("Informe o CPF do usuário: ")
-    usuario = filtrar_usuario(cpf, usuarios)
-
-    if usuario:
-        conta_nova = ContaCorrente.nova_conta(usuario, numero)
-        usuario.adicionar_conta(conta_nova)
-        print("\n=== Conta criada com sucesso! ===")
-        return conta_nova
-    else:    
-        print("\n@@@ Usuário não encontrado, fluxo de criação de conta encerrado! @@@")
-        return None
-
-def filtrar_usuario(cpf:str, usuarios:list) -> Cliente:
-    usuarios_filtrados = [usuario for usuario in usuarios if usuario.cpf == cpf]
-    return usuarios_filtrados[0] if usuarios_filtrados else None
-
-def filtrar_conta(numero:int, contas:list) -> Conta:
-    contas_filtradas = [conta for conta in contas if conta.numero == numero]
-    return contas_filtradas[0] if contas_filtradas else None
 
 #CORPO DO PROGRAMA
 def main():
 
     usuarios = [];  contas = []
 
+    usuario1 = PessoaFisica('algum lugar', [], '01234567890', 'alguem1', '01-02-2000')
+    conta1 = ContaCorrente(usuario1, Historico(), Conta._AGENCIA, 1)
+    usuario1.adicionar_conta(conta1)
+    usuarios = [usuario1];  contas = [conta1]
+
     while True:
         opcao = menu()
         if opcao == "d":
-            numero_conta = int(input("Informe o número da conta (somente número):) "))
-            conta = filtrar_conta(numero_conta, contas)
-            usuario = conta._cliente
-            usuario.realizar_transacao(conta, Deposito)
+            depositar(contas)
         
         elif opcao == "s": 
-            numero_conta = int(input("Informe o número da conta (somente número):) "))
-            conta = filtrar_conta(numero_conta, contas)
-            usuario = conta._cliente
-            usuario.realizar_transacao(conta, Saque)
+            sacar(contas)
 
         elif opcao == "e":
-            numero_conta = int(input("Informe o número da conta (somente número):) "))
-            conta = filtrar_conta(numero_conta, contas)
-            exibir_extrato(conta)
+            exibir_extrato(contas)
 
         elif opcao == "nu": 
-            usuarios = PessoaFisica.criar_usuario(usuarios)
+            usuarios = criar_usuario(usuarios)
             print(usuarios)
 
         elif opcao == "nc":
-            numero_conta = len(contas) + 1
-            contas.append(criar_conta(numero_conta, usuarios))
+            contas = criar_conta(contas, usuarios)
             print(contas)
 
         elif opcao == "lc":
-            Conta.listar_contas(contas)
+            listar_contas(contas)
 
         elif opcao == "q":
             break
