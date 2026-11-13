@@ -4,6 +4,7 @@
 from abc import ABC, abstractmethod
 
 #CLASSES
+
     #Cliente
 class Cliente(ABC):
     def __init__(self, endereco:str, contas:list):
@@ -132,6 +133,27 @@ class ContaCorrente(Conta):
         cliente.adicionar_conta(conta_nova)
         return conta_nova
 
+    #ITERADOR
+class ContaIterador:
+    def __init__(self, contas:list):
+        self._contas = contas
+        self._contador = 0
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        try:
+            conta = self._contas[self._contador]
+            informacao = f"""\
+                Agência:\t{conta._agencia}
+                C/C:\t\t{conta._numero}
+                Titular:\t{conta._cliente._nome}
+            """
+            self._contador += 1
+            return informacao
+        except IndexError:
+            raise StopIteration
+        
 
 
     #Transação
@@ -184,7 +206,7 @@ def log_transacao(operacao):
     @wraps(operacao)
     def envelope(*args, **kwargs):
         print('Transação de ' + operacao.__name__.title() + ' em ' + str(datetime.now()))
-        operacao(*args, **kwargs)    
+        return operacao(*args, **kwargs)    
     return envelope
 
 #FUNÇÕES ESTÁTICAS
@@ -240,7 +262,7 @@ def filtrar_usuario(cpf:str, usuarios:list) -> Cliente:
 
     #Conta
 @log_transacao
-def criar_conta(contas:list, usuarios:list) -> Conta:  
+def criar_conta(contas:list, usuarios:list) -> list:  
     numero = len(contas) + 1
     cpf = input("Informe o CPF do usuário: ")
     usuario = filtrar_usuario(cpf, usuarios)
@@ -262,14 +284,9 @@ def filtrar_conta(numero:int, contas:list) -> Conta:
 def listar_contas(contas:list):
     import textwrap
 
-    for conta in contas:
-        linha = f"""\
-            Agência:\t{conta._agencia}
-            C/C:\t\t{conta._numero}
-            Titular:\t{conta._cliente._nome}
-        """
+    for informacao in ContaIterador(contas):
         print("=" * 100)
-        print(textwrap.dedent(linha))
+        print(textwrap.dedent(informacao))
 
 @log_transacao
 def exibir_extrato(contas:list):
@@ -279,7 +296,7 @@ def exibir_extrato(contas:list):
             print("\n@@@ Conta não encontrada! @@@")
             return False
     input_transacao = input('Qual o tipo de transacao?\n\'d\': Depósito, \'s\': Saque ou outra tecla: todos.\n')
-    match input_transacao:
+    match input_transacao.lower():
         case 'd':
             tipo_transacao = Deposito
         case 's':
@@ -335,7 +352,7 @@ def main():
 
         elif opcao == "nu": 
             usuarios = criar_usuario(usuarios)
-            print(usuarios)
+            # print(usuarios)
 
         elif opcao == "nc":
             contas = criar_conta(contas, usuarios)
@@ -350,7 +367,6 @@ def main():
         else:
             print("Operação inválida, por favor selecione novamente a operação desejada.")
 
-# print (f'{type(Deposito(50))}')
 
 main()
 
