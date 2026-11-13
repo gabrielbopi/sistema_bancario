@@ -156,13 +156,26 @@ class Saque(Transacao):
 
 class Historico:
     def __init__(self):
-        self.transacoes = []
+        self._transacoes = []
 
     def __str__(self):
             return '\n'.join([f'{transacao}' for transacao in self.transacoes])
         
     def adicionar_transacao(self, transacao:Transacao):
         self.transacoes.append(transacao)
+
+    @property
+    def transacoes(self):
+        return self._transacoes
+    
+    #GERADOR
+    def gerar_relatorio(self, tipo_transacao=None):
+        if tipo_transacao:
+            for transacao in self._transacoes:
+                yield transacao if type(transacao)==type(tipo_transacao(0)) else None
+        else:
+            for transacao in self._transacoes:
+                yield transacao
 
 #DECORADOR
 def log_transacao(operacao):
@@ -262,8 +275,23 @@ def listar_contas(contas:list):
 def exibir_extrato(contas:list):
     numero_conta = int(input("Informe o número da conta (somente número):) "))
     conta = filtrar_conta(numero_conta, contas)
+    if not conta:
+            print("\n@@@ Conta não encontrada! @@@")
+            return False
+    input_transacao = input('Qual o tipo de transacao?\n\'d\': Depósito, \'s\': Saque ou outra tecla: todos.\n')
+    match input_transacao:
+        case 'd':
+            tipo_transacao = Deposito
+        case 's':
+            tipo_transacao = Saque
+        case _:
+            tipo_transacao = None
+
     print("\n================ EXTRATO ================")
-    print("Não foram realizadas movimentações." if not conta._historico else conta._historico)
+    extrato = ''
+    for transacao in conta.historico.gerar_relatorio(tipo_transacao):
+        extrato += f'{transacao}\n' if transacao else ''
+    print("Não foram realizadas movimentações desse tipo." if extrato == '' else extrato)
     print(f"\nSaldo:\t\tR$ {conta.saldo:.2f}")
     print("==========================================")
 
@@ -322,6 +350,7 @@ def main():
         else:
             print("Operação inválida, por favor selecione novamente a operação desejada.")
 
+# print (f'{type(Deposito(50))}')
 
 main()
 
